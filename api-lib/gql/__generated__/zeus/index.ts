@@ -12292,7 +12292,7 @@ columns and relationships of "distributions" */
     dts_created: ModelTypes['timestamp'];
     /** An object relationship */
     epoch?: ModelTypes['epochs'];
-    epoch_id?: number;
+    epoch_id: number;
     /** An object relationship */
     gift_private?: ModelTypes['pending_gift_private'];
     id: ModelTypes['bigint'];
@@ -18315,7 +18315,7 @@ columns and relationships of "distributions" */
     dts_created: GraphQLTypes['timestamp'];
     /** An object relationship */
     epoch?: GraphQLTypes['epochs'];
-    epoch_id?: number;
+    epoch_id: number;
     /** An object relationship */
     gift_private?: GraphQLTypes['pending_gift_private'];
     id: GraphQLTypes['bigint'];
