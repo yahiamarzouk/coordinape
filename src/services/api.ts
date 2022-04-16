@@ -4,7 +4,7 @@ import axios from 'axios';
 import { API_URL } from 'config/env';
 import { getSignature } from 'utils/provider';
 
-import { IApiLogin, IApiManifest } from 'types';
+import { IApiLogin } from 'types';
 
 axios.defaults.baseURL = API_URL;
 
@@ -51,15 +51,6 @@ export class APIService {
       hash,
       address,
       data,
-    });
-    return response.data;
-  };
-
-  getManifest = async (circleId?: number): Promise<IApiManifest> => {
-    const response = await this.axios.get('/v2/manifest', {
-      params: {
-        circle_id: circleId,
-      },
     });
     return response.data;
   };
