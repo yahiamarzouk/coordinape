@@ -4,14 +4,7 @@ import axios from 'axios';
 import { API_URL } from 'config/env';
 import { getSignature } from 'utils/provider';
 
-import {
-  IApiTokenGift,
-  IApiUser,
-  IApiEpoch,
-  IApiLogin,
-  PostTokenGiftsParam,
-  UpdateCreateEpochParam,
-} from 'types';
+import { IApiLogin } from 'types';
 
 axios.defaults.baseURL = API_URL;
 
@@ -59,35 +52,6 @@ export class APIService {
       address,
       data,
     });
-    return response.data;
-  };
-
-  updateEpoch = async (
-    circleId: number,
-    epochId: number,
-    params: UpdateCreateEpochParam
-  ): Promise<IApiEpoch> => {
-    const response = await this.axios.put(
-      `/v2/${circleId}/admin/epoches/${epochId}`,
-      {
-        data: JSON.stringify(params),
-      }
-    );
-    return response.data as IApiEpoch;
-  };
-
-  postTokenGifts = async (
-    circleId: number,
-    params: PostTokenGiftsParam[]
-  ): Promise<IApiUser & { pending_sent_gifts: IApiTokenGift[] }> => {
-    const response = await this.axios.post(`/v2/${circleId}/token-gifts`, {
-      data: JSON.stringify(params),
-    });
-    return response.data;
-  };
-
-  getDiscordWebhook = async (circleId: number): Promise<any> => {
-    const response = await this.axios.get(`/v2/${circleId}/admin/webhook`);
     return response.data;
   };
 
