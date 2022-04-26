@@ -42,6 +42,8 @@ async function handler(req: VercelRequest, res: VercelResponse) {
     });
   }
 
+  // create the user
+
   const createUserMutation: ValueTypes['mutation_root'] =
     existingUser?.deleted_at
       ? {

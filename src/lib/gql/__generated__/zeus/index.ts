@@ -21,6 +21,16 @@ export type ValueTypes = {
     recipient_id: number;
     tokens: number;
   };
+  ['AllocationCsvInput']: {
+    circle_id: number;
+    epoch?: number | null;
+    epoch_id?: number | null;
+    grant?: number | null;
+  };
+  ['AllocationCsvResponse']: AliasType<{
+    file?: boolean;
+    __typename?: boolean;
+  }>;
   ['Allocations']: {
     allocations?: ValueTypes['Allocation'][];
     circle_id: number;
@@ -101,6 +111,10 @@ export type ValueTypes = {
     non_receiver?: boolean | null;
     role?: number | null;
     starting_tokens?: number | null;
+  };
+  ['CreateUsersInput']: {
+    circle_id: number;
+    users?: ValueTypes['UserObj'][];
   };
   ['DeleteEpochInput']: {
     circle_id: number;
@@ -235,6 +249,15 @@ export type ValueTypes = {
   };
   ['UploadImageInput']: {
     image_data_base64: string;
+  };
+  ['UserObj']: {
+    address: string;
+    fixed_non_receiver?: boolean | null;
+    name: string;
+    non_giver?: boolean | null;
+    non_receiver?: boolean | null;
+    role?: number | null;
+    starting_tokens?: number | null;
   };
   ['UserResponse']: AliasType<{
     /** An object relationship */
@@ -1643,6 +1666,10 @@ columns and relationships of "distributions" */
       { payload: ValueTypes['AdminUpdateUserInput'] },
       ValueTypes['UserResponse']
     ];
+    allocationCsv?: [
+      { payload: ValueTypes['AllocationCsvInput'] },
+      ValueTypes['AllocationCsvResponse']
+    ];
     createCircle?: [
       { payload: ValueTypes['CreateCircleInput'] },
       ValueTypes['CreateCircleResponse']
@@ -1657,6 +1684,10 @@ columns and relationships of "distributions" */
     ];
     createUser?: [
       { payload: ValueTypes['CreateUserInput'] },
+      ValueTypes['UserResponse']
+    ];
+    createUsers?: [
+      { payload: ValueTypes['CreateUsersInput'] },
       ValueTypes['UserResponse']
     ];
     deleteEpoch?: [
@@ -4342,6 +4373,10 @@ columns and relationships of "distributions" */
 export type ModelTypes = {
   ['AdminUpdateUserInput']: GraphQLTypes['AdminUpdateUserInput'];
   ['Allocation']: GraphQLTypes['Allocation'];
+  ['AllocationCsvInput']: GraphQLTypes['AllocationCsvInput'];
+  ['AllocationCsvResponse']: {
+    file: string;
+  };
   ['Allocations']: GraphQLTypes['Allocations'];
   ['AllocationsResponse']: {
     /** An object relationship */
@@ -4369,6 +4404,7 @@ export type ModelTypes = {
     nominee: ModelTypes['nominees'];
   };
   ['CreateUserInput']: GraphQLTypes['CreateUserInput'];
+  ['CreateUsersInput']: GraphQLTypes['CreateUsersInput'];
   ['DeleteEpochInput']: GraphQLTypes['DeleteEpochInput'];
   ['DeleteEpochResponse']: {
     success: boolean;
@@ -4414,6 +4450,7 @@ export type ModelTypes = {
   ['UpdateUserInput']: GraphQLTypes['UpdateUserInput'];
   ['UploadCircleImageInput']: GraphQLTypes['UploadCircleImageInput'];
   ['UploadImageInput']: GraphQLTypes['UploadImageInput'];
+  ['UserObj']: GraphQLTypes['UserObj'];
   ['UserResponse']: {
     /** An object relationship */
     UserResponse: ModelTypes['users'];
@@ -4827,10 +4864,12 @@ columns and relationships of "distributions" */
   /** mutation root */
   ['mutation_root']: {
     adminUpdateUser?: ModelTypes['UserResponse'];
+    allocationCsv?: ModelTypes['AllocationCsvResponse'];
     createCircle?: ModelTypes['CreateCircleResponse'];
     createEpoch?: ModelTypes['EpochResponse'];
     createNominee?: ModelTypes['CreateNomineeResponse'];
     createUser?: ModelTypes['UserResponse'];
+    createUsers?: (ModelTypes['UserResponse'] | undefined)[];
     deleteEpoch?: ModelTypes['DeleteEpochResponse'];
     deleteUser?: ModelTypes['ConfirmationResponse'];
     /** delete data from the table: "circle_integrations" */
@@ -5761,6 +5800,16 @@ export type GraphQLTypes = {
     recipient_id: number;
     tokens: number;
   };
+  ['AllocationCsvInput']: {
+    circle_id: number;
+    epoch?: number;
+    epoch_id?: number;
+    grant?: number;
+  };
+  ['AllocationCsvResponse']: {
+    __typename: 'AllocationCsvResponse';
+    file: string;
+  };
   ['Allocations']: {
     allocations?: Array<GraphQLTypes['Allocation']>;
     circle_id: number;
@@ -5830,6 +5879,10 @@ export type GraphQLTypes = {
     non_receiver?: boolean;
     role?: number;
     starting_tokens?: number;
+  };
+  ['CreateUsersInput']: {
+    circle_id: number;
+    users?: Array<GraphQLTypes['UserObj']>;
   };
   ['DeleteEpochInput']: {
     circle_id: number;
@@ -5964,6 +6017,15 @@ export type GraphQLTypes = {
   };
   ['UploadImageInput']: {
     image_data_base64: string;
+  };
+  ['UserObj']: {
+    address: string;
+    fixed_non_receiver?: boolean;
+    name: string;
+    non_giver?: boolean;
+    non_receiver?: boolean;
+    role?: number;
+    starting_tokens?: number;
   };
   ['UserResponse']: {
     __typename: 'UserResponse';
@@ -7198,10 +7260,12 @@ columns and relationships of "distributions" */
   ['mutation_root']: {
     __typename: 'mutation_root';
     adminUpdateUser?: GraphQLTypes['UserResponse'];
+    allocationCsv?: GraphQLTypes['AllocationCsvResponse'];
     createCircle?: GraphQLTypes['CreateCircleResponse'];
     createEpoch?: GraphQLTypes['EpochResponse'];
     createNominee?: GraphQLTypes['CreateNomineeResponse'];
     createUser?: GraphQLTypes['UserResponse'];
+    createUsers?: Array<GraphQLTypes['UserResponse'] | undefined>;
     deleteEpoch?: GraphQLTypes['DeleteEpochResponse'];
     deleteUser?: GraphQLTypes['ConfirmationResponse'];
     /** delete data from the table: "circle_integrations" */

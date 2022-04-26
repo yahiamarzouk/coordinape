@@ -77,6 +77,32 @@ export const AllTypesProps: Record<string, any> = {
       required: true,
     },
   },
+  AllocationCsvInput: {
+    circle_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    epoch: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    epoch_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    grant: {
+      type: 'Float',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+  },
   Allocations: {
     allocations: {
       type: 'Allocation',
@@ -319,6 +345,20 @@ export const AllTypesProps: Record<string, any> = {
       array: false,
       arrayRequired: false,
       required: false,
+    },
+  },
+  CreateUsersInput: {
+    circle_id: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    users: {
+      type: 'UserObj',
+      array: true,
+      arrayRequired: false,
+      required: true,
     },
   },
   DeleteEpochInput: {
@@ -711,6 +751,50 @@ export const AllTypesProps: Record<string, any> = {
       array: false,
       arrayRequired: false,
       required: true,
+    },
+  },
+  UserObj: {
+    address: {
+      type: 'String',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    fixed_non_receiver: {
+      type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    name: {
+      type: 'String',
+      array: false,
+      arrayRequired: false,
+      required: true,
+    },
+    non_giver: {
+      type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    non_receiver: {
+      type: 'Boolean',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    role: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: false,
+    },
+    starting_tokens: {
+      type: 'Int',
+      array: false,
+      arrayRequired: false,
+      required: false,
     },
   },
   VouchInput: {
@@ -5634,6 +5718,14 @@ export const AllTypesProps: Record<string, any> = {
         required: true,
       },
     },
+    allocationCsv: {
+      payload: {
+        type: 'AllocationCsvInput',
+        array: false,
+        arrayRequired: false,
+        required: true,
+      },
+    },
     createCircle: {
       payload: {
         type: 'CreateCircleInput',
@@ -5661,6 +5753,14 @@ export const AllTypesProps: Record<string, any> = {
     createUser: {
       payload: {
         type: 'CreateUserInput',
+        array: false,
+        arrayRequired: false,
+        required: true,
+      },
+    },
+    createUsers: {
+      payload: {
+        type: 'CreateUsersInput',
         array: false,
         arrayRequired: false,
         required: true,
@@ -13325,6 +13425,9 @@ export const ReturnTypes: Record<string, any> = {
     ttl: 'Int',
     refresh: 'Boolean',
   },
+  AllocationCsvResponse: {
+    file: 'String',
+  },
   AllocationsResponse: {
     user: 'users',
     user_id: 'Int',
@@ -13516,10 +13619,12 @@ export const ReturnTypes: Record<string, any> = {
   },
   mutation_root: {
     adminUpdateUser: 'UserResponse',
+    allocationCsv: 'AllocationCsvResponse',
     createCircle: 'CreateCircleResponse',
     createEpoch: 'EpochResponse',
     createNominee: 'CreateNomineeResponse',
     createUser: 'UserResponse',
+    createUsers: 'UserResponse',
     deleteEpoch: 'DeleteEpochResponse',
     deleteUser: 'ConfirmationResponse',
     delete_circle_integrations: 'circle_integrations_mutation_response',
