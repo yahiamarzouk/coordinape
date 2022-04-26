@@ -39,6 +39,7 @@ export const paths = {
   adminCircles: '/admin/circles',
   allocation: '/allocation',
   circles: '/circles',
+  claims: '/claims',
   connectIntegration: '/connect-integration',
   createCircle: APP_PATH_CREATE_CIRCLE,
   developers: '/developers',

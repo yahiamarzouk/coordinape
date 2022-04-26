@@ -6,6 +6,7 @@ import DevPortalPage from '../pages/DevPortalPage';
 import AdminPage from 'pages/AdminPage';
 import AllocationPage from 'pages/AllocationPage';
 import CirclesPage from 'pages/CirclesPage';
+import ClaimsPage from 'pages/ClaimsPage';
 import CreateCirclePage from 'pages/CreateCirclePage';
 import DefaultPage from 'pages/DefaultPage';
 import DistributePage from 'pages/DistributePage';
@@ -64,6 +65,7 @@ const LoggedInRoutes = () => {
       <Route path={paths.epoch} element={<AllocationPage />} />
       <Route path={paths.give} element={<AllocationPage />} />
       <Route path={paths.circles} element={<CirclesPage />} />
+      <Route path={paths.claims} element={<ClaimsPage />} />
       <Route path={paths.vaults} element={<VaultsPage />} />
       <Route path={paths.vaultTxs(':id')} element={<VaultTransactions />} />
       <Route
