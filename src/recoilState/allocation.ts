@@ -20,11 +20,6 @@ import {
 
 import { IUser, ISimpleGift, IAllocationStep } from 'types';
 
-export const rGiftsByEpoch = selector({
-  key: 'rGiftsByEpoch',
-  get: ({ get }) => iti(get(rGiftsMap).values()).toGroups(g => g.epoch_id),
-});
-
 export const rUserGifts = selectorFamily({
   key: 'rUserGifts',
   get:
@@ -160,15 +155,6 @@ const rLocalGiftRaw = selectorFamily<ISimpleGift | undefined, number>({
 export const rLocalGift = (userId: number, circleId: number) =>
   rLocalGiftRaw(userId * PARAM_OFFSET + circleId);
 
-export const rEpochFirstVisit = selectorFamily<boolean, number>({
-  key: 'rEpochFirstVisit',
-  get:
-    (circleId: number) =>
-    ({ get }) =>
-      get(rMyProfile).myUsers?.find(u => u.circle_id === circleId)
-        ?.epoch_first_visit ?? true,
-});
-
 export const rAllocationStepStatus = selectorFamily<
   [Set<IAllocationStep>, IAllocationStep | undefined],
   number
@@ -203,6 +189,3 @@ export const rAllocationStepStatus = selectorFamily<
 
 export const useUserGifts = (userId: number) =>
   useRecoilValue(rUserGifts(userId));
-
-export const useAllocationStepStatus = (circleId: number) =>
-  useRecoilValue(rAllocationStepStatus(circleId));

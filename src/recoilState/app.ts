@@ -126,16 +126,6 @@ export const rUsersMap = selector({
   },
 });
 
-export const rPastGiftsMap = selector({
-  key: 'rPastGiftsMap',
-  get: async ({ get }) => get(rFullCircle).pastGiftsMap,
-});
-
-export const rPendingGiftsMap = selector({
-  key: 'rPendingGiftsMap',
-  get: async ({ get }) => get(rFullCircle).pendingGiftsMap,
-});
-
 export const rGiftsMap = selector({
   key: 'rGiftsMap',
   get: async ({ get }) => get(rFullCircle).giftsMap,
@@ -325,17 +315,6 @@ export const rCircleEpochsStatus = selectorFamily({
     },
 });
 
-export const rCircleNominees = selectorFamily({
-  key: 'rCircleNominees',
-  get:
-    (circleId: number) =>
-    ({ get }) =>
-      iti(get(rNomineesMap).values())
-        .filter(n => n.circle_id === circleId)
-        .sort(({ expiryDate: a }, { expiryDate: b }) => a.diff(b).milliseconds)
-        .toArray(),
-});
-
 type ExtractRecoilType<P> = P extends (a: any) => RecoilValueReadOnly<infer T>
   ? T
   : never;
@@ -373,11 +352,5 @@ export const useAuthToken = () => {
 export const useSelectedCircleLoadable = () =>
   useRecoilValueLoadable(rCircle(useSelectedCircleId()));
 
-export const useSelectedCircleEpochsStatus = () =>
-  useEpochsStatus(useSelectedCircleId());
-
 export const useProfile = (address: string) =>
   useRecoilValue(rProfile(address));
-
-export const useEpochsStatus = (circleId: number) =>
-  useRecoilValue(rCircleEpochsStatus(circleId));
