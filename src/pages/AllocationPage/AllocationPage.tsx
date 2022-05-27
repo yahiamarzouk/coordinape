@@ -15,7 +15,7 @@ import { ApeInfoTooltip } from 'components';
 import {
   useApiWithSelectedCircle,
   useAllocation,
-  useAllocationController,
+  // useAllocationController,
 } from 'hooks';
 import { BalanceIcon } from 'icons';
 import { useSelectedCircle } from 'recoilState/app';
@@ -119,15 +119,13 @@ export const AllocationPage = () => {
     circle: selectedCircle,
     circleEpochsStatus: { epochIsActive },
   } = useSelectedCircle();
-  useAllocationController(circleId);
+  // useAllocationController(circleId);
   const {
-    localTeammatesChanged,
     localGiftsChanged,
     tokenRemaining,
     completedSteps,
     rebalanceGifts,
     saveGifts,
-    saveTeammates,
   } = useAllocation(circleId);
 
   const { updateMyUser } = useApiWithSelectedCircle();
@@ -186,9 +184,8 @@ export const AllocationPage = () => {
     }
   };
 
-  const handleSaveTeamList = async () => {
+  const handleTeammatesSaved = async () => {
     try {
-      await saveTeammates();
       if (epochIsActive) {
         setActiveStep(STEP_ALLOCATION.key);
         navigate(STEP_ALLOCATION.path);
@@ -197,12 +194,8 @@ export const AllocationPage = () => {
       console.warn('handleSaveTeamList', e);
     }
   };
-
   const handleSaveAllocations = async () => {
     try {
-      if (localTeammatesChanged) {
-        await saveTeammates();
-      }
       await saveGifts();
     } catch (e) {
       console.warn('handleSaveAllocations', e);
@@ -282,25 +275,10 @@ export const AllocationPage = () => {
         )}
 
         {selectedMyUser && activeStep === 1 && (
-          <>
-            <AllocationTeam />
-            <div className={classes.buttonContainer}>
-              {localTeammatesChanged ? (
-                <Button size="large" color="alert" onClick={handleSaveTeamList}>
-                  Save Teammate List
-                </Button>
-              ) : (
-                <Button
-                  size="large"
-                  color="alert"
-                  disabled={!epochIsActive}
-                  onClick={getHandleStep(STEP_ALLOCATION)}
-                >
-                  Continue with this team
-                </Button>
-              )}
-            </div>
-          </>
+          <AllocationTeam
+            onSave={handleTeammatesSaved}
+            onContinue={getHandleStep(STEP_ALLOCATION)}
+          />
         )}
 
         {epochIsActive && activeStep === 2 && (

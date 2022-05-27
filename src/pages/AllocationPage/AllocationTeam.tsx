@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
+import assert from 'assert';
+import React, { useEffect, useState } from 'react';
 
 import clsx from 'clsx';
+import { updateTeammates } from 'lib/gql/mutations';
+import isEqual from 'lodash/isEqual';
 import { transparentize } from 'polished';
+import { useQuery, useQueryClient } from 'react-query';
 
 import { Button, makeStyles } from '@material-ui/core';
 
 import { ReactComponent as CheckmarkSVG } from 'assets/svgs/button/checkmark.svg';
-import { ApeAvatar } from 'components';
 import { useAllocation } from 'hooks';
+import useConnectedAddress from 'hooks/useConnectedAddress';
 import { useSelectedCircle } from 'recoilState/app';
-import { Text } from 'ui';
+import { Avatar, Box, Button as UIButton, Flex, Text } from 'ui';
+
+import { getTeammates } from './queries';
 
 const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
   header: {
     marginLeft: 'auto',
     marginRight: 'auto',
@@ -209,38 +211,124 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-enum OrderType {
-  Alphabetical = 'Alphabetical',
-  Give_Allocated = 'Give Allocated',
-  Opt_In_First = 'Opt-In First',
-}
-
-const AllocationTeam = () => {
+type AllocationTeamProps = {
+  onSave: () => void;
+  onContinue: () => void;
+};
+const AllocationTeam = ({ onContinue, onSave }: AllocationTeamProps) => {
   const classes = useStyles();
   const {
     circleId,
-    usersNotMe: availableTeammates,
     circle: selectedCircle,
     circleEpochsStatus: { epochIsActive, timingMessage },
   } = useSelectedCircle();
 
-  const {
-    localTeammates,
-    givePerUser,
-    toggleLocalTeammate,
-    setAllLocalTeammates,
-    clearLocalTeammates,
-  } = useAllocation(circleId);
+  const address = useConnectedAddress();
 
+  const [changed, setChanged] = useState<boolean>(false);
+
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isIdle, isStale } = useQuery(
+    ['teammates', selectedCircle.id],
+    () => getTeammates(selectedCircle.id, address as string),
+    {
+      enabled: !!(selectedCircle.id && address),
+      refetchOnReconnect: false,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity,
+    }
+  );
+
+  const { allUsers, startingTeammates } = data || { allUsers: [] };
+
+  const [localTeammates, setLocalTeammates] = useState<
+    NonNullable<typeof startingTeammates>
+  >([]);
+
+  useEffect(() => {
+    if (!isLoading && !isIdle && !isStale && data?.startingTeammates) {
+      setLocalTeammates(data?.startingTeammates);
+    }
+  }, [data, isLoading, isIdle, isStale]);
+
+  const saveTeammates = async () => {
+    await updateTeammates(
+      selectedCircle.id,
+      localTeammates.map(u => u.id)
+    );
+    onSave();
+    queryClient.invalidateQueries('teammates');
+  };
+
+  useEffect(() => {
+    if (isLoading || isIdle) return;
+    setChanged(
+      !isEqual(
+        localTeammates.map(u => u.id),
+        startingTeammates?.map(u => u.id)
+      )
+    );
+  }, [startingTeammates, localTeammates, isLoading, isIdle]);
+
+  const toggleLocalTeammate = (userId: number) => {
+    const addedUser = allUsers?.find(u => u.id === userId);
+    assert(addedUser);
+    const newTeammates = localTeammates.find(u => u.id === userId)
+      ? localTeammates.filter(u => u.id !== userId)
+      : [...localTeammates, addedUser];
+    setLocalTeammates(newTeammates);
+    updateLocalGifts(newTeammates);
+  };
+
+  const setAllLocalTeammates = () => {
+    assert(allUsers);
+    setLocalTeammates(allUsers);
+    updateLocalGifts(allUsers);
+  };
+
+  const clearLocalTeammates = () => {
+    if (!selectedCircle.team_selection) {
+      console.error('clearLocalTeammates with circle without team selection');
+      return;
+    }
+    setLocalTeammates([]);
+    updateLocalGifts([]);
+  };
+
+  const { givePerUser, updateLocalGifts } = useAllocation(circleId);
   const [keyword, setKeyword] = useState<string>('');
-  const orderType = OrderType.Alphabetical as OrderType; // Was useState
 
   const onChangeKeyword = (event: React.ChangeEvent<HTMLInputElement>) => {
     setKeyword(event.target.value);
   };
 
   return (
-    <div className={classes.root}>
+    <Flex column>
+      <Box
+        css={{
+          zIndex: 1,
+          position: 'fixed',
+          bottom: '$1xl',
+          left: '50%',
+          '> button': { ml: '-50%' },
+        }}
+      >
+        {changed ? (
+          <UIButton size="large" color="alert" onClick={saveTeammates}>
+            Save Teammate List
+          </UIButton>
+        ) : (
+          <UIButton
+            size="large"
+            color="alert"
+            disabled={!epochIsActive}
+            onClick={onContinue}
+          >
+            Continue with this team
+          </UIButton>
+        )}
+      </Box>
       <div className={classes.header}>
         {!epochIsActive && (
           <Text h3 css={{ mb: '$sm', justifyContent: 'center' }}>
@@ -281,33 +369,15 @@ const AllocationTeam = () => {
           className={classes.teammatesContainer}
           data-testid="eligibleTeammates"
         >
-          {availableTeammates
+          {allUsers
             .filter(a => !a.non_receiver)
-            .sort((a, b) => {
-              switch (orderType) {
-                case OrderType.Alphabetical:
-                  return a.name.localeCompare(b.name);
-                case OrderType.Give_Allocated: {
-                  const av = givePerUser.get(a.id)?.tokens ?? 0;
-                  const bv = givePerUser.get(b.id)?.tokens ?? 0;
-                  if (av !== bv) {
-                    return av - bv;
-                  } else {
-                    return a.name.localeCompare(b.name);
-                  }
-                }
-                case OrderType.Opt_In_First: {
-                  return Number(a.non_receiver) - Number(b.non_receiver);
-                }
-              }
-            })
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map(user => {
               const selected = localTeammates.some(u => u.id === user.id);
               const pendingSentGifts = givePerUser.get(user.id)?.tokens ?? 0;
               const matched =
                 keyword.length === 0 ||
-                user.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                String(pendingSentGifts).includes(keyword);
+                user.name.toLowerCase().includes(keyword.toLowerCase());
 
               return { ...user, selected, matched, pendingSentGifts };
             })
@@ -321,7 +391,7 @@ const AllocationTeam = () => {
                 key={user.id}
                 onClick={() => toggleLocalTeammate(user.id)}
               >
-                <ApeAvatar user={user} className={classes.avatar} />
+                <Avatar small path={user.profile.avatar} name={user.name} />
                 {user.name} | {user.pendingSentGifts}
                 <div
                   className={classes.checkmarkIconWrapper}
@@ -332,7 +402,7 @@ const AllocationTeam = () => {
               </Button>
             ))}
         </div>
-        {availableTeammates.filter(a => a.non_receiver).length > 0 && (
+        {allUsers.filter(a => a.non_receiver).length > 0 && (
           <>
             <p className={classes.contentTitle}>
               These users are opted-out of receiving{' '}
@@ -340,34 +410,16 @@ const AllocationTeam = () => {
             </p>
             <hr className={classes.hr} />
             <div className={classes.teammatesContainer}>
-              {availableTeammates
+              {allUsers
                 .filter(a => a.non_receiver)
-                .sort((a, b) => {
-                  switch (orderType) {
-                    case OrderType.Alphabetical:
-                      return a.name.localeCompare(b.name);
-                    case OrderType.Give_Allocated: {
-                      const av = givePerUser.get(a.id)?.tokens ?? 0;
-                      const bv = givePerUser.get(b.id)?.tokens ?? 0;
-                      if (av !== bv) {
-                        return av - bv;
-                      } else {
-                        return a.name.localeCompare(b.name);
-                      }
-                    }
-                    case OrderType.Opt_In_First: {
-                      return Number(a.non_receiver) - Number(b.non_receiver);
-                    }
-                  }
-                })
+                .sort((a, b) => a.name.localeCompare(b.name))
                 .map(user => {
                   const selected = localTeammates.some(u => u.id === user.id);
                   const pendingSentGifts =
                     givePerUser.get(user.id)?.tokens ?? 0;
                   const matched =
                     keyword.length === 0 ||
-                    user.name.toLowerCase().includes(keyword.toLowerCase()) ||
-                    String(pendingSentGifts).includes(keyword);
+                    user.name.toLowerCase().includes(keyword.toLowerCase());
 
                   return { ...user, selected, matched, pendingSentGifts };
                 })
@@ -381,7 +433,7 @@ const AllocationTeam = () => {
                     key={user.id}
                     onClick={() => toggleLocalTeammate(user.id)}
                   >
-                    <ApeAvatar user={user} className={classes.avatar} />
+                    <Avatar small path={user.profile.avatar} name={user.name} />
                     {user.name} | {user.pendingSentGifts}
                     <div
                       className={classes.checkmarkIconWrapper}
@@ -395,7 +447,7 @@ const AllocationTeam = () => {
           </>
         )}
       </div>
-    </div>
+    </Flex>
   );
 };
 

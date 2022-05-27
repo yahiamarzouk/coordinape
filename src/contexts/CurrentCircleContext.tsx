@@ -9,7 +9,9 @@ interface ICurrentCircleContext {
   baseTeammates?: number[];
   isLoading: boolean;
   circleId: number;
+  userId: number;
   setCurrentCircleId?: (circleId: number) => void;
+  setUserId?: (userId: number) => void;
   circleError?: unknown;
 }
 
@@ -18,6 +20,7 @@ const defaultState: ICurrentCircleContext = {
   baseTeammates: [],
   isLoading: true,
   circleId: -1,
+  userId: -1,
 };
 
 const CurrentCircleContext = createContext<ICurrentCircleContext>(defaultState);
@@ -31,6 +34,7 @@ export const CurrentCircleProvider = ({
   const [circleId, setCurrentCircleId] = useState<number>(
     defaultState.circleId
   );
+  const [userId, setUserId] = useState<number>(defaultState.userId);
 
   const {
     data: baseTeammates,
@@ -77,7 +81,9 @@ export const CurrentCircleProvider = ({
           baseTeammates,
           isLoading,
           setCurrentCircleId,
+          setUserId,
           circleId,
+          userId,
           circleError,
         }}
       >

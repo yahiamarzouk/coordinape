@@ -27,12 +27,10 @@ export const SentryScopeController = () => {
 
 const AllocationScope = () => {
   const circleId = useSelectedCircleId();
-  const { localTeammatesChanged, localGiftsChanged, tokenRemaining } =
-    useAllocation(circleId);
+  const { localGiftsChanged, tokenRemaining } = useAllocation(circleId);
 
   useEffect(() => {
     Sentry.configureScope(scope => {
-      scope.setTag('local_teammates_changed', localTeammatesChanged);
       scope.setTag('local_gifts_changed', localGiftsChanged);
       scope.setTag('tokens_remaining', tokenRemaining);
     });

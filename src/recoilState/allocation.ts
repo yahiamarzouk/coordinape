@@ -1,5 +1,4 @@
 import iti from 'itiriri';
-import isEqual from 'lodash/isEqual';
 import { atomFamily, selectorFamily, useRecoilValue, selector } from 'recoil';
 
 import {
@@ -85,19 +84,6 @@ export const rBaseTeammates = selectorFamily<IUser[], number>({
       const teammateIds = myUser.teammates.map(t => t.id);
       return get(rAvailableTeammates).filter(t => teammateIds.includes(t.id));
     },
-});
-
-export const rLocalTeammates = atomFamily({
-  key: 'rLocalTeammates',
-  default: rBaseTeammates,
-});
-
-export const rLocalTeammatesChanged = selectorFamily({
-  key: 'rLocalTeammatesChanged',
-  get:
-    (circleId: number) =>
-    ({ get }) =>
-      !isEqual(get(rBaseTeammates(circleId)), get(rLocalTeammates(circleId))),
 });
 
 export const rLocalGifts = atomFamily<ISimpleGift[], number>({
