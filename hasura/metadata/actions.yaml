@@ -149,6 +149,7 @@ actions:
     - name: verification_key
       value_from_env: HASURA_EVENT_SECRET
   permissions:
+  - role: api-user
   - role: user
 - name: updateEpoch
   definition:
@@ -226,6 +227,7 @@ actions:
     - name: verification_key
       value_from_env: HASURA_EVENT_SECRET
   permissions:
+  - role: api-user
   - role: user
 custom_types:
   enums: []
