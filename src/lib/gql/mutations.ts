@@ -656,6 +656,8 @@ export async function allocationCsv(
   circleId: number,
   epoch?: number,
   epochId?: number,
+  formGiftAmount?: number,
+  giftTokenSymbol?: string,
   grant?: number
 ) {
   const { allocationCsv } = await client.mutate(
@@ -667,6 +669,8 @@ export async function allocationCsv(
             epoch_id: epochId,
             grant: grant,
             epoch: epoch,
+            form_gift_amount: formGiftAmount,
+            gift_token_symbol: giftTokenSymbol,
           },
         },
         {
