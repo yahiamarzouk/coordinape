@@ -121,17 +121,13 @@ export function useSubmitDistribution() {
         };
       });
 
-      const totalAmount = prev
-        ? newTotalAmount.add(BigNumber.from(prev.tokenTotal))
-        : newTotalAmount;
-
       const response = await saveDistribution({
         // FIXME: we're storing total amounts as fixed numbers & claim amounts
         // as floating-point numbers. we should change this to be consistent,
         // but that will probably require hacking Zeus to return numeric
         // columns as FixedNumber, not Number; otherwise, we create rounding
         // error as soon as we read from the DB...
-        total_amount: FixedNumber.from(totalAmount).toString(),
+        total_amount: distribution.tokenTotal,
 
         epoch_id: Number(epochId),
         merkle_root: distribution.merkleRoot,
@@ -192,7 +188,7 @@ export function useSubmitDistribution() {
       showInfo('Distribution saved successfully');
       return {
         merkleRoot: distribution.merkleRoot,
-        totalAmount,
+        totalAmount: BigNumber.from(distribution.tokenTotal),
         epochId: distributorEpochId,
       };
     } catch (e) {
